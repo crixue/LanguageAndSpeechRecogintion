@@ -31,6 +31,13 @@ logs/
 tensorboard/
 .ipynb_checkpoints/
 logs.rar
+decoder_vocab_mapping.txt
+encoder_vocab_mapping.txt
+TransformerModel.data-00000-of-00001
+.idea/
+.idea/workspace.xml
+events.out.tfevents.*
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
