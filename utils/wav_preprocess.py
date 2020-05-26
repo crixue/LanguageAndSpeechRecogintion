@@ -5,6 +5,7 @@ import numpy as np
 import glob
 
 from utils.common import *
+from sklearn.utils import shuffle
 
 
 def compute_freq_feature(wav_file):
@@ -60,24 +61,38 @@ def get_wav_thchs30_list(pathname, symbol_data_base_dict):
     :param symbol_data_base_dict:  含有对应拼音文件的基本路径
     :return:
     '''
-    pinyin2id_dict = pinyin2id()
-
     all_list = []
     for file_abs_path in glob.glob(os.path.join(pathname, "*.wav")):
         file_name = os.path.splitext(os.path.split(file_abs_path)[-1])[0]
 
         symbol_file_abs_path = os.path.join(symbol_data_base_dict, file_name + ".wav.trn")
         pinyin_str = get_wav_thchs30_symbol(symbol_file_abs_path)
-        py_id_list = []
-        for single_pinyin in pinyin_str.split():
-            if pinyin2id_dict[single_pinyin] != None:
-                py_id_list.append(pinyin2id_dict[single_pinyin])
-            else:
-                py_id_list.append(-1)
+        py_id_list = pinyin_str_trans_to_ids(pinyin_str)
 
         all_list.append([file_abs_path, py_id_list])
 
     return all_list
+
+
+def pinyin_str_trans_to_ids(pinyin_str):
+    '''
+    将拼音字符串转成id list
+    :param pinyin_str:
+    :return:
+    '''
+    py_id_list = []
+    pinyin2id_dict = pinyin2id()
+    for single_pinyin in pinyin_str.split():
+        try:
+
+            if single_pinyin in pinyin2id_dict.keys():
+                py_id_list.append(pinyin2id_dict[single_pinyin])
+            else:
+                single_pinyin += "5"
+                py_id_list.append(pinyin2id_dict[single_pinyin])
+        except KeyError:
+            py_id_list.append("_")
+    return py_id_list
 
 
 def get_wav_thchs30_symbol(file_abs_path):
@@ -88,7 +103,7 @@ def get_wav_thchs30_symbol(file_abs_path):
     pinyin_str = ''
     with open(file_abs_path, 'r', encoding='utf-8') as f:
         txt_lines = f.readlines()
-        if len(txt_lines) <= 2:
+        if len(txt_lines) < 2:
             pinyin_str = ''
         else:
             pinyin_str = txt_lines[1]
@@ -96,7 +111,69 @@ def get_wav_thchs30_symbol(file_abs_path):
     return pinyin_str
 
 
+def load_type1_dir_wav_list(wav_root_path):
+    '''
+    类型1：wav_root_path下有多个wav的子目录
+    每个wav文件和wav.trn都在同一个目录下
+    :param wav_root_path:
+    :return:
+    '''
+    all_list = []
+    for root, dirs, files in tqdm(os.walk(wav_root_path)):
+        for file in files:
+            if not file.endswith(".wav"):
+                continue
+
+            file_abs_path = os.path.join(root, file)
+            file_name = os.path.splitext(os.path.split(file)[-1])[0]
+            symbol_file_abs_path = os.path.join(root, file_name + ".trn")
+            if not os.path.exists(symbol_file_abs_path):
+                continue
+            pinyin_str = get_wav_thchs30_symbol(symbol_file_abs_path)
+            print(symbol_file_abs_path + ":", pinyin_str)
+            py_id_list = pinyin_str_trans_to_ids(pinyin_str)
+
+            all_list.append([file_abs_path, py_id_list])
+    return all_list
+
+
+def load_various_wav_train_data():
+    all_list = []
+    type1_dir = [
+        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\train"
+    ]
+    for part_of_path in type1_dir:
+        one_part_wav_list = load_type1_dir_wav_list(part_of_path)
+        for one_part_wav in one_part_wav_list:
+            all_list.append(one_part_wav)
+
+    part_of_list = get_wav_thchs30_list("H:\\PycharmProjects\\dataset\\data_thchs30\\train",
+                                    "H:\\PycharmProjects\\dataset\\data_thchs30\\data")
+    for one_part_wav in part_of_list:
+        all_list.append(one_part_wav)
+
+    return shuffle(all_list)
+
+
+def load_various_wav_dev_data():
+    all_list = []
+    type1_dir = [
+        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\dev"
+    ]
+    for part_of_path in type1_dir:
+        one_part_wav_list = load_type1_dir_wav_list(part_of_path)
+        for one_part_wav in one_part_wav_list:
+            all_list.append(one_part_wav)
+
+    part_of_list = get_wav_thchs30_list("H:\\PycharmProjects\\dataset\\data_thchs30\\dev",
+                                    "H:\\PycharmProjects\\dataset\\data_thchs30\\data")
+    for one_part_wav in part_of_list:
+        all_list.append(one_part_wav)
+
+    return shuffle(all_list)
+
+
 if __name__ == '__main__':
-    all_list = get_wav_thchs30_list("H:\\PycharmProjects\\dataset\\data_thchs30\\dev", "H:\\PycharmProjects\\dataset\\data_thchs30\\data")
+    all_list = load_various_wav_dev_data()
     print()
 

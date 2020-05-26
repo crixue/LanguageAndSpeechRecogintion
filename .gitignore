@@ -28,6 +28,9 @@ share/python-wheels/
 MANIFEST
 
 logs/
+smLogs/
+logs_speechRec/
+logs_speechRec_1/
 tensorboard/
 .ipynb_checkpoints/
 logs.rar

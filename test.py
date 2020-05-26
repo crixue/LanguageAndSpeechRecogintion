@@ -1,6 +1,18 @@
 import glob
 import os
+import numpy as np
 
 
-for file in glob.glob(os.path.join("H:\\PycharmProjects\\dataset\\data_thchs30\\train", "*.wav")):
-    print(os.path.splitext(os.path.split(file)[-1])[0])
+import glob
+import time
+
+MODEL_LOGS_DIR_NAME = "logs_speechRec"
+if __name__ == '__main__':
+    # un_tar("D:\\pyworkspace\\data\\train-test\\A2_0")
+    # write_pinyin_to_trn("D:\\pyworkspace\\data\\train-test\\A2_0")
+    # print(chinese_chars_transform_pingyin("中国"))
+
+    sorted_model_list = sorted(glob.glob(os.path.join(MODEL_LOGS_DIR_NAME, '*.model')),
+                               key=lambda x: time.localtime(os.path.getmtime(x)),
+                               reverse=True)
+    print()
