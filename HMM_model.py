@@ -123,6 +123,7 @@ def viterbi(word_list, pinyin_list, n):
 if __name__ == '__main__':
     pinyin_list = ['qin2', 'lao2', 'yong3', 'gan3']
     pinyin_list = ['zhong1', 'guo2', 'ren2', 'min2']
+    pinyin_list = ['xin1', 'zhi1', 'du4', 'ming2']
     word_id_list = []
     n = 0
     for i, single_pinyin in enumerate(pinyin_list):

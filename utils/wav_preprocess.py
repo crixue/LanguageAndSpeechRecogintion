@@ -4,6 +4,7 @@ import os
 import numpy as np
 import glob
 
+from utils import common
 from utils.common import *
 from sklearn.utils import shuffle
 
@@ -91,7 +92,7 @@ def pinyin_str_trans_to_ids(pinyin_str):
                 single_pinyin += "5"
                 py_id_list.append(pinyin2id_dict[single_pinyin])
         except KeyError:
-            py_id_list.append("_")
+            py_id_list.append(common.UNKNOWN_INDEX)
     return py_id_list
 
 
@@ -118,6 +119,7 @@ def load_type1_dir_wav_list(wav_root_path):
     :param wav_root_path:
     :return:
     '''
+    count = 0
     all_list = []
     for root, dirs, files in tqdm(os.walk(wav_root_path)):
         for file in files:
@@ -130,17 +132,22 @@ def load_type1_dir_wav_list(wav_root_path):
             if not os.path.exists(symbol_file_abs_path):
                 continue
             pinyin_str = get_wav_thchs30_symbol(symbol_file_abs_path)
-            print(symbol_file_abs_path + ":", pinyin_str)
+            # print(symbol_file_abs_path + ":", pinyin_str)
             py_id_list = pinyin_str_trans_to_ids(pinyin_str)
 
             all_list.append([file_abs_path, py_id_list])
+            count += 1
+            # if count >= 1000:
+            #     break;
     return all_list
 
 
 def load_various_wav_train_data():
+    print("load_various_wav_train_data start, please wait...")
     all_list = []
     type1_dir = [
-        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\train"
+        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\train",
+        "H:\\PycharmProjects\\dataset\\data_aishell\\wav\\train"
     ]
     for part_of_path in type1_dir:
         one_part_wav_list = load_type1_dir_wav_list(part_of_path)
@@ -152,13 +159,15 @@ def load_various_wav_train_data():
     for one_part_wav in part_of_list:
         all_list.append(one_part_wav)
 
+    print("load_various_wav_train_data has ended...")
     return shuffle(all_list)
 
 
 def load_various_wav_dev_data():
     all_list = []
     type1_dir = [
-        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\dev"
+        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\dev",
+        "H:\\PycharmProjects\\dataset\\data_aishell\\wav\\dev"
     ]
     for part_of_path in type1_dir:
         one_part_wav_list = load_type1_dir_wav_list(part_of_path)

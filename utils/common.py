@@ -5,6 +5,10 @@ import tarfile as tar
 from tqdm import tqdm
 from pypinyin import pinyin, lazy_pinyin, Style
 
+
+UNKNOWN_SYMBOL = '<UNKNOWN>'
+UNKNOWN_INDEX = 1422
+
 dict_txt_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dict.txt")
 lang_model1_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "language_model1.txt")
 lang_model2_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "language_model2.txt")
@@ -113,7 +117,9 @@ def pinyin2id():
     '''
     dict_symbol = get_symbol_list()
     single_pinyin_lists = dict_symbol.keys()
-    return {single_pinyin: idx for idx, single_pinyin in enumerate(single_pinyin_lists)}
+    pinyin2id_dict = {single_pinyin: idx for idx, single_pinyin in enumerate(single_pinyin_lists)}
+    pinyin2id_dict[UNKNOWN_SYMBOL] = UNKNOWN_INDEX
+    return pinyin2id_dict
 
 
 def get_language_model(model_fn):
@@ -206,6 +212,8 @@ def chinese_chars_transform_pingyin(chars):
 def write_pinyin_to_trn(file_dir):
     for root, dirs, files in tqdm(os.walk(file_dir,topdown=True)):
         for file in files:
+            # if not file.endswith(".txt"):
+            #     continue
             if not file.endswith(".trn"):
                 continue
 
@@ -222,7 +230,33 @@ def write_pinyin_to_trn(file_dir):
                 f.write("\n" + pinyin_str)
 
 
+def add_trn_correspond_dir(wav_root_path,
+                           trans_script_file_path="H:\\PycharmProjects\\dataset\\data_aishell\\transcript\\aishell_transcript_v0.8.txt"):
+    fns_dict = {}
+    with open(trans_script_file_path, 'r', encoding='utf-8') as f:
+        for line in f.readlines():
+            splits = line.split(' ')
+            fn = splits[0]
+            wav_word_str = ''.join(splits[1:])
+            fns_dict[fn] = wav_word_str
+
+    for root, dirs, files in tqdm(os.walk(wav_root_path, topdown=True)):
+        for file in files:
+            if not file.endswith(".wav"):
+                continue
+
+            fname = file.split(".")[0]
+            if fname in fns_dict.keys():
+                with open(os.path.join(root, fname+".trn"), 'w+', encoding='utf-8') as f1:
+                    f1.write(fns_dict[fname])
+                    f1.write(' '.join(chinese_chars_transform_pingyin(fns_dict[fname])))
+
+
+
+
 if __name__ == '__main__':
     # dict_model = get_hidden_status_init_probs()
-    write_pinyin_to_trn("H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus")
-    print()
+    # write_pinyin_to_trn("H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus")
+    # pd = pinyin2id()
+    # add_trn_correspond_dir(wav_root_path="H:\\PycharmProjects\\dataset\\data_aishell\\wav")
+    print(chinese_chars_transform_pingyin("爱了么"))
