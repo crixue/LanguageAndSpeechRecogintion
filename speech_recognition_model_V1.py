@@ -5,12 +5,10 @@ import platform as plat
 import os
 import time
 import logging as log
-log.basicConfig(filename='SpeechRecognitionModelV1.log',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S %p',level=log.INFO)
-
-import keras as kr
-import numpy as np
-import random
-import pdb
+log.basicConfig(filename='SpeechRecognitionModelV1.log',
+                format='%(asctime)s %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S %p',
+                level=log.INFO)
 
 import tensorflow as tf
 from keras.models import Sequential, Model
