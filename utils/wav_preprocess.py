@@ -7,6 +7,7 @@ import glob
 from utils import common
 from utils.common import *
 from sklearn.utils import shuffle
+import logging as log
 
 
 def compute_freq_feature(wav_file):
@@ -132,7 +133,7 @@ def load_type1_dir_wav_list(wav_root_path):
             if not os.path.exists(symbol_file_abs_path):
                 continue
             pinyin_str = get_wav_thchs30_symbol(symbol_file_abs_path)
-            # print(symbol_file_abs_path + ":", pinyin_str)
+            # log.info(symbol_file_abs_path + ":", pinyin_str)
             py_id_list = pinyin_str_trans_to_ids(pinyin_str)
 
             all_list.append([file_abs_path, py_id_list])
@@ -143,39 +144,39 @@ def load_type1_dir_wav_list(wav_root_path):
 
 
 def load_various_wav_train_data():
-    print("load_various_wav_train_data start, please wait...")
+    log.info("load_various_wav_train_data start, please wait...")
     all_list = []
     type1_dir = [
-        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\train",
-        "H:\\PycharmProjects\\dataset\\data_aishell\\wav\\train"
+        "D:\\data\\aidatatang_200zh\\corpus\\train",
+        "D:\\data\\data_aishell\\wav\\train"
     ]
     for part_of_path in type1_dir:
         one_part_wav_list = load_type1_dir_wav_list(part_of_path)
         for one_part_wav in one_part_wav_list:
             all_list.append(one_part_wav)
 
-    part_of_list = get_wav_thchs30_list("H:\\PycharmProjects\\dataset\\data_thchs30\\train",
-                                    "H:\\PycharmProjects\\dataset\\data_thchs30\\data")
+    part_of_list = get_wav_thchs30_list("D:\\data\\data_thchs30\\train",
+                                    "D:\\data\\data_thchs30\\data")
     for one_part_wav in part_of_list:
         all_list.append(one_part_wav)
 
-    print("load_various_wav_train_data has ended...")
+    log.info("load_various_wav_train_data has ended...")
     return shuffle(all_list)
 
 
 def load_various_wav_dev_data():
     all_list = []
     type1_dir = [
-        "H:\\PycharmProjects\\dataset\\aidatatang_200zh\\corpus\\dev",
-        "H:\\PycharmProjects\\dataset\\data_aishell\\wav\\dev"
+        "D:\\data\\aidatatang_200zh\\corpus\\dev",
+        "D:\\data\\data_aishell\\wav\\dev"
     ]
     for part_of_path in type1_dir:
         one_part_wav_list = load_type1_dir_wav_list(part_of_path)
         for one_part_wav in one_part_wav_list:
             all_list.append(one_part_wav)
 
-    part_of_list = get_wav_thchs30_list("H:\\PycharmProjects\\dataset\\data_thchs30\\dev",
-                                    "H:\\PycharmProjects\\dataset\\data_thchs30\\data")
+    part_of_list = get_wav_thchs30_list("D:\\data\\data_thchs30\\dev",
+                                    "D:\\data\\data_thchs30\\data")
     for one_part_wav in part_of_list:
         all_list.append(one_part_wav)
 
@@ -184,5 +185,5 @@ def load_various_wav_dev_data():
 
 if __name__ == '__main__':
     all_list = load_various_wav_dev_data()
-    print()
+    log.info()
 
